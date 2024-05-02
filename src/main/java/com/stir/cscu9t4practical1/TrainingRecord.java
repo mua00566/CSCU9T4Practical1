@@ -40,4 +40,22 @@ public class TrainingRecord {
        tr.clear();
    }
    
+   public String findAllEntriesByDate(int d, int m, int y) {
+    String allEntries = "";
+    ListIterator<Entry> iter = tr.listIterator();
+
+    while (iter.hasNext()) {
+      Entry current = iter.next();
+      if (current.getDay() == d && current.getMonth() == m && current.getYear() == y) {
+        allEntries += current.getEntry() + "\n"; // Add current entry 
+      }
+    }
+
+    if (allEntries.isEmpty()) {
+      allEntries = "No entries found for this date."; // Handle no entries
+    }
+
+    return allEntries;
+  }
+   
 } // TrainingRecord
