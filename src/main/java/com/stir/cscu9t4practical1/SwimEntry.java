@@ -6,7 +6,7 @@ package com.stir.cscu9t4practical1;
 
 /**
  *
- * @author omair
+ * @author 3141983
  */
 public class SwimEntry extends Entry{
     private String location;
