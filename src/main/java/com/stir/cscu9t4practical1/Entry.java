@@ -49,10 +49,10 @@ public class Entry {
   } //getYear
 
   public String getEntry () {
-   String result = getName()+" ran " + getDistance() + " km in "
-             +getHour()+":"+getMin()+":"+ getSec() + " on "
+       String result = getName()+ " did "
+             +getDistance() + " km of an unspecified training type, in a time of "
+             +getHour()+":"+getMin()+":"+ getSec() + ", on "
              +getDay()+"/"+getMonth()+"/"+getYear()+"\n";
    return result;
-  } //getEntry
-   
+  }
 } // Entry

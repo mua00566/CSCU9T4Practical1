@@ -9,7 +9,8 @@ import java.lang.Number;
 
 public class TrainingRecordGUI extends JFrame implements ActionListener {
 
-    private JTextField name = new JTextField(30);
+    private JComboBox<String> entryType = new JComboBox<String>(new String[] {"", "Run", "Cycle", "Swim"});
+    private JTextField name = new JTextField(25);
     private JTextField day = new JTextField(2);
     private JTextField month = new JTextField(2);
     private JTextField year = new JTextField(4);
@@ -17,6 +18,13 @@ public class TrainingRecordGUI extends JFrame implements ActionListener {
     private JTextField mins = new JTextField(2);
     private JTextField secs = new JTextField(2);
     private JTextField dist = new JTextField(4);
+    private JComboBox<String> runType = new JComboBox<String>(new String[] {"", 
+        "4x40m with 3 min recovery", "4x300m with 6 min recovery", "1x5km"});
+    private JComboBox<String> swimLocation = new JComboBox<String>(new String[] {"", "Pool", "Outdoors"});
+    private JTextField cycleTerrain = new JTextField(7);
+    private JTextField cycleTempo = new JTextField(7);
+    
+    private JLabel labtype = new JLabel(" Session Type:");
     private JLabel labn = new JLabel(" Name:");
     private JLabel labd = new JLabel(" Day:");
     private JLabel labm = new JLabel(" Month:");
@@ -24,14 +32,20 @@ public class TrainingRecordGUI extends JFrame implements ActionListener {
     private JLabel labh = new JLabel(" Hours:");
     private JLabel labmm = new JLabel(" Mins:");
     private JLabel labs = new JLabel(" Secs:");
-    private JLabel labdist = new JLabel(" Distance (km):");
+    private JLabel labdist = new JLabel(" Total Distance (km):");
+    private JLabel labruntype = new JLabel(" Type of run:");
+    private JLabel labswimlocation = new JLabel(" Swim Location:");
+    private JLabel labcycleterrain = new JLabel(" Cycle Terrain:");
+    private JLabel labcycletempo = new JLabel(" Cycle Tempo:");
+    
     private JButton addR = new JButton("Add");
-    private JButton lookUpByDate = new JButton("Look Up");
+    private JButton lookUpByDate = new JButton("Look Up By Date");
     private JButton findAllByDate = new JButton("Find All By Date");
+    private JButton removeByNameAndDate = new JButton("Remove By Name And Date");
     
     private TrainingRecord myAthletes = new TrainingRecord();
 
-    private JTextArea outputArea = new JTextArea(5, 50);
+    private JTextArea outputArea = new JTextArea(27, 60);
 
     public static void main(String[] args) {
         TrainingRecordGUI applic = new TrainingRecordGUI();
@@ -41,6 +55,9 @@ public class TrainingRecordGUI extends JFrame implements ActionListener {
     public TrainingRecordGUI() {
         super("Training Record");
         setLayout(new FlowLayout());
+        add(labtype);
+        add(entryType);
+        entryType.setEditable(true);
         add(labn);
         add(name);
         name.setEditable(true);
@@ -65,15 +82,29 @@ public class TrainingRecordGUI extends JFrame implements ActionListener {
         add(labdist);
         add(dist);
         dist.setEditable(true);
+        add(labruntype);
+        add(runType);
+        runType.setEditable(true);
+        add(labswimlocation);
+        add(swimLocation);
+        swimLocation.setEditable(true);
+        add(labcycleterrain);
+        add(cycleTerrain);
+        cycleTerrain.setEditable(true);
+        add(labcycletempo);
+        add(cycleTempo);
+        cycleTempo.setEditable(true);
         add(addR);
         addR.addActionListener(this);
         add(lookUpByDate);
         lookUpByDate.addActionListener(this);
         add(findAllByDate);
         findAllByDate.addActionListener(this);
+        add(removeByNameAndDate);
+        removeByNameAndDate.addActionListener(this);
         add(outputArea);
         outputArea.setEditable(false);
-        setSize(720, 200);
+        setSize(745, 650);
         setVisible(true);
         blankDisplay();
 
@@ -86,39 +117,88 @@ public class TrainingRecordGUI extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent event) {
         String message = "";
         if (event.getSource() == addR) {
-            message = addEntry("generic");
+            message = addEntry();
         }
         if (event.getSource() == lookUpByDate) {
             message = lookupEntry();
         }
-        else if (event.getSource() == findAllByDate) {
-        message = findAllEntriesByDate();
-        outputArea.setText(message.replace("\n", "\n\n")); // Spacing via double newline for 
+        if (event.getSource() == findAllByDate) {
+            message = findAllEntriesByDate();
+        }
+        if (event.getSource() == removeByNameAndDate) {
+            message = removeRecord();
         }
         outputArea.setText(message);
         blankDisplay();
     } // actionPerformed
     
     public String findAllEntriesByDate() {
-    int m = Integer.parseInt(month.getText());
-    int d = Integer.parseInt(day.getText());
-    int y = Integer.parseInt(year.getText());
-    return myAthletes.findAllEntriesByDate(d, m, y); // Call method in TrainingRecord
-    }
-
-    public String addEntry(String what) {
-        String message = "Record added\n";
-        System.out.println("Adding "+what+" entry to the records");
-        String n = name.getText();
         int m = Integer.parseInt(month.getText());
         int d = Integer.parseInt(day.getText());
         int y = Integer.parseInt(year.getText());
-        float km = java.lang.Float.parseFloat(dist.getText());
-        int h = Integer.parseInt(hours.getText());
-        int mm = Integer.parseInt(mins.getText());
-        int s = Integer.parseInt(secs.getText());
-        Entry e = new Entry(n, d, m, y, h, mm, s, km);
-        myAthletes.addEntry(e);
+        return myAthletes.findAllEntriesByDate(d, m, y); // Call method in TrainingRecord
+    }
+
+    public String addEntry() {
+        String message = "";
+        System.out.println("Adding entry to the records...");
+        String sessionType = entryType.getSelectedItem().toString();
+        String n = name.getText();
+        String dText = day.getText();
+        String mText = month.getText();
+        String yText = year.getText();
+        String kmText = dist.getText();
+        String hText = hours.getText();
+        String mmText = mins.getText();
+        String sText = secs.getText();
+        String typeOfRun = runType.getSelectedItem().toString();
+        String locationSwim = swimLocation.getSelectedItem().toString();
+        String terrain = cycleTerrain.getText();
+        String tempo = cycleTempo.getText();
+        
+        if (n.isEmpty() || dText.isEmpty() || mText.isEmpty() || yText.isEmpty() || kmText.isEmpty() 
+                || hText.isEmpty() || mmText.isEmpty() || sText.isEmpty()) {
+            return "Please do not leave name, date, time, or distance fields empty!";
+        }
+        if (sessionType.equals("Run") && typeOfRun.isEmpty()){
+            return "For 'Run' session type, please fill out the 'Type of run' field";
+        } else if (sessionType.equals("Swim") && locationSwim.isEmpty()){
+            return "For 'Swim' session type, please fill out the 'Swim Location' field";
+        } else if (sessionType.equals("Cycle") && (terrain.isEmpty() || tempo.isEmpty())){
+            return "For 'Cycle' session type, please fill out the 'Cycle Terrain' and 'Cycle Tempo' fields";
+        }
+        
+        int d = Integer.parseInt(dText);
+        int m = Integer.parseInt(mText);
+        int y = Integer.parseInt(yText);
+        float km = java.lang.Float.parseFloat(kmText);
+        int h = Integer.parseInt(hText);
+        int mm = Integer.parseInt(mmText);
+        int s = Integer.parseInt(sText);
+        
+        if (sessionType.equals("Run")){
+            Entry e = new SprintEntry(n, d, m, y, h, mm, s, km, typeOfRun);
+            message = myAthletes.addEntry(e);
+        } else if(sessionType.equals("Swim")){
+            Entry e = new SwimEntry(n, d, m, y, h, mm, s, km, locationSwim);
+            message = myAthletes.addEntry(e);
+        } else if(sessionType.equals("Cycle")){
+            Entry e = new CycleEntry(n, d, m, y, h, mm, s, km, terrain, tempo);
+            message = myAthletes.addEntry(e);
+        } else if(sessionType.equals("")){
+            Entry e = new Entry(n, d, m, y, h, mm, s, km);
+            message = myAthletes.addEntry(e);
+        }
+        return message;
+    }
+    
+    public String removeRecord(){
+        String n = name.getText();
+        int d = Integer.parseInt(day.getText());
+        int m = Integer.parseInt(month.getText());
+        int y = Integer.parseInt(year.getText());
+        outputArea.setText("removing record...");
+        String message = myAthletes.removeRecord(n, d, m, y);
         return message;
     }
     
@@ -132,6 +212,7 @@ public class TrainingRecordGUI extends JFrame implements ActionListener {
     }
 
     public void blankDisplay() {
+        entryType.setSelectedItem("");
         name.setText("");
         day.setText("");
         month.setText("");
@@ -140,6 +221,10 @@ public class TrainingRecordGUI extends JFrame implements ActionListener {
         mins.setText("");
         secs.setText("");
         dist.setText("");
+        runType.setSelectedItem("");
+        swimLocation.setSelectedItem("");
+        cycleTerrain.setText("");
+        cycleTempo.setText("");
 
     }// blankDisplay
     // Fills the input fields on the display for testing purposes only

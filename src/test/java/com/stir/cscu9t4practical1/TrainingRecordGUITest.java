@@ -88,11 +88,19 @@ public class TrainingRecordGUITest {
     public void testAddEntry(){
         System.out.println("addEntry");
         TrainingRecordGUI instance = new TrainingRecordGUI();
+        
         Entry entry = new Entry("Alice", 1, 2, 2003, 0, 16, 7, 3);
         instance.fillDisplay(entry);
-        String message = instance.addEntry("generic");
+        String message = instance.addEntry();
         System.out.println(message);
-        assertEquals(message,"Record added\n");
+        assertEquals(message,"Record added successfully");
+        
+        // Check for potential empty mandatory field
+        Entry entry2 = new Entry("", 1, 2, 2003, 0, 16, 7, 3);
+        instance.fillDisplay(entry2);
+        String message2 = instance.addEntry();
+        System.out.println(message2);
+        assertEquals(message2,"Please do not leave name, date, time, or distance fields empty!");
     }
     
     /**
